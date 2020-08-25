@@ -1,5 +1,6 @@
 package com.app.contactapp.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -89,6 +90,12 @@ class SingupActivity : BaseActivity() {
                         ).show()
                         return@OnCompleteListener
                     } else {
+                        getSharedPreferences("contactapp", Context.MODE_PRIVATE)
+                            .edit()
+                            .putString("sign_in", "email")
+                            .commit()
+
+
                         val intent = Intent(this@SingupActivity, MainActivity::class.java)
                         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TASK
                         startActivity(intent)

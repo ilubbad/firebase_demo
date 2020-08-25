@@ -9,7 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.adapters.ChangePasswordActivity"></activity>
+        <activity android:name=".ui.ContactDetailActivity"></activity>
+        <activity android:name=".ui.ChangePasswordActivity" />
         <activity android:name=".ui.ForgetPasswordActivity" />
         <activity android:name=".ui.SingupActivity" />
         <activity android:name=".ui.LoginActivity">
@@ -19,7 +20,13 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.MainActivity" />
+        <activity android:name=".ui.MainActivity">
+
+        </activity>
+
+        <meta-data
+            android:name="android.support.PARENT_ACTIVITY"
+            android:value=".ui.MainActivity" />
     </application>
 
 </manifest>

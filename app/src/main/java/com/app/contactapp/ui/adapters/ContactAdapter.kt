@@ -24,16 +24,19 @@ class ContactAdapter(
     interface AdapterActions {
         fun deleteContact(contact: Contact)
         fun editContact(contact: Contact)
+        fun openDetail(contact: Contact)
 
     }
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+
         fun bind(item: Contact, listener: AdapterActions) = with(itemView) {
             tvLastName.text = item.lastName
             tvFirstName.text = item.firstName
             tvEmail.text = item.email
             btnDelete.setOnClickListener { listener.deleteContact(item) }
             btnEdit.setOnClickListener { listener.editContact(item) }
+            layout.setOnClickListener { listener.openDetail(item) }
         }
     }
 

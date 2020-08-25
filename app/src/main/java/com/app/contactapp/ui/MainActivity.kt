@@ -1,6 +1,7 @@
 package com.app.contactapp.ui
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
@@ -14,7 +15,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.contactapp.R
 import com.app.contactapp.data.Contact
-import com.app.contactapp.ui.adapters.ChangePasswordActivity
 import com.app.contactapp.ui.adapters.ContactAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
@@ -251,6 +251,13 @@ class MainActivity : BaseActivity() {
                                 showContactDailog(contact)
                             }
 
+                            override fun openDetail(contact: Contact) {
+                                val intent =
+                                    Intent(this@MainActivity, ContactDetailActivity::class.java)
+                                intent.putExtra("contact", contact)
+                                startActivity(intent)
+                            }
+
 
                         })
 
@@ -361,6 +368,10 @@ class MainActivity : BaseActivity() {
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.main_menu, menu)
+        val isGoogleSignIn = getSharedPreferences("contactapp", Context.MODE_PRIVATE)
+            .getString("sign_in", "").equals("google")
+        menu!!.findItem(R.id.btnChangePassword).isVisible = !isGoogleSignIn
+
         return super.onCreateOptionsMenu(menu)
     }
 

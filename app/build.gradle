@@ -43,6 +43,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-core:17.5.0'
     implementation 'com.squareup.retrofit2:converter-scalars:2.5.0'
 
+    implementation 'com.google.android.gms:play-services-auth:15.0.1'
 
 
 

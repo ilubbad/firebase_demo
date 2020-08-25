@@ -1,4 +1,4 @@
-package com.app.contactapp.ui.adapters
+package com.app.contactapp.ui
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,8 +6,6 @@ import android.util.Log
 import android.view.View
 import android.widget.*
 import com.app.contactapp.R
-import com.app.contactapp.ui.BaseActivity
-import com.app.contactapp.ui.LoginActivity
 import com.google.firebase.auth.EmailAuthProvider.getCredential
 import com.google.firebase.auth.FirebaseAuth
 
