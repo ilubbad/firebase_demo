@@ -27,11 +27,21 @@ interface Contact {
 // Add new contact
 app.post('/contacts', async (req, res) => {
     try {
+
+       
+
+        if(req.body['firstName'] === undefined || req.body['lastName']=== undefined||req.body['email']=== undefined) {
+           throw new Error("incorrect data ");
+          }
+
+
         const contact: Contact = {
             firstName: req.body['firstName'],
             lastName: req.body['lastName'],
             email: req.body['email']
         }
+
+        
 
         const newDoc = await firebaseHelper.firestore
             .createNewDocument(db, contactsCollection, contact);
