@@ -1,16 +1,16 @@
-package com.app.contactapp.ui
+package com.app.contactapp.ui.screens
 
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
+import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.app.contactapp.R
@@ -18,8 +18,6 @@ import com.app.contactapp.data.Contact
 import com.app.contactapp.ui.adapters.ContactAdapter
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
 
 /**
  * Created by ibraheem lubbad on 8/23/20.
@@ -60,6 +58,18 @@ class MainActivity : BaseActivity() {
         rvItems = findViewById(R.id.rvItems)
         progressBar = findViewById(R.id.progressBar)
 
+        getViewModel().isLoading.observe(this, {
+            if (getViewModel().IS_TESTING) return@observe
+            if (it) {
+                showLoading()
+            } else {
+                hideLoading()
+            }
+
+        })
+
+
+
 
         getAllContact()
         //get current user
@@ -87,6 +97,7 @@ class MainActivity : BaseActivity() {
         progressBar!!.visibility = View.GONE
     }
 
+    lateinit var dialogShowContact: AlertDialog
     private fun showContactDailog(contact: Contact?) {
 
 
@@ -94,7 +105,7 @@ class MainActivity : BaseActivity() {
         val dialoglayout: View = inflater.inflate(R.layout.dialog, null)
         val builder: AlertDialog.Builder = AlertDialog.Builder(this)
         builder.setView(dialoglayout)
-        val dialog = builder.create()
+        dialogShowContact = builder.create()
         val edEmail = dialoglayout.findViewById<EditText>(R.id.edEmail)
         val edFirstName = dialoglayout.findViewById<EditText>(R.id.edFirstName)
         val edLastName = dialoglayout.findViewById<EditText>(R.id.edLastName)
@@ -134,142 +145,92 @@ class MainActivity : BaseActivity() {
 
 
             if (contact == null) {
-                createContact(dialog, Contact(null, firstName, lastName, email))
+                createContact(Contact(null, firstName, lastName, email))
             } else {
-                updateContact(dialog, Contact(contact.id, firstName, lastName, email))
+                updateContact(Contact(contact.id, firstName, lastName, email))
             }
 
 
         }
 
-        dialog.show()
+        dialogShowContact.show()
 
     }
 
     private val TAG = "MainActivity"
     private fun createContact(
-        builder: AlertDialog,
         contact: Contact
     ) {
 
-        showLoading()
 
-        compositeDisposable.add(
-            getDataManager().createNewContact(contact)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
+        getViewModel().createNewContact(contact)
 
-                    hideLoading()
-                    Toast.makeText(this, "Created ", Toast.LENGTH_LONG).show()
+        getViewModel().contactCreated.observe(this, Observer {
+            if (it) {
+                hideLoading()
+                Toast.makeText(this, "Created ", Toast.LENGTH_LONG).show()
+                dialogShowContact.dismiss()
 
 
-                    builder.dismiss()
-                    getAllContact()
-                }) { throwable ->
-                    hideLoading()
-                    Toast.makeText(this, throwable.message, Toast.LENGTH_LONG).show()
-                }
-        )
+                getAllContact()
+            }
+        })
+
     }
 
-    private fun updateContact(dialog: AlertDialog, contact: Contact) {
-        showLoading()
-        compositeDisposable.add(
-            getDataManager().updateContact(contact)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ loginResponse ->
-                    Log.d(TAG, "updateContact: " + loginResponse)
+    private fun updateContact(contact: Contact) {
 
-                    dialog.dismiss()
-                    hideLoading()
-                    getAllContact()
-                }) { throwable ->
-                    hideLoading()
-                    Log.d(TAG, "updateContact: " + throwable.message)
+        getViewModel().updateContact(contact)
+        getViewModel().contactUpdated.observe(this, {
+            dialogShowContact.dismiss()
+            getAllContact()
+        })
 
-                }
-        )
+
     }
 
 
-    private fun getContact(id: String) {
-
-        compositeDisposable.add(
-            getDataManager().getContact(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ loginResponse ->
-                    Log.d(TAG, "getContact: " + loginResponse)
-
-                }) { throwable ->
-                    Log.d(TAG, "getContact: " + throwable.message)
-
-                }
-        )
-    }
 
     private fun deleteContact(id: String) {
         showLoading()
-        compositeDisposable.add(
-            getDataManager().deleteContact(id)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    hideLoading()
-                    getAllContact()
-                }) { throwable ->
-                    hideLoading()
-                    Log.d(TAG, "deleteContact: " + throwable.message)
+        getViewModel().deleteContact(id)
+        getViewModel().contactDeleted.observe(this, {
+            if (it) {
+                getAllContact()
+            }
+        })
 
-                }
-        )
     }
 
     private fun getAllContact() {
-        showLoading()
-        compositeDisposable.add(
-            getDataManager().getAllContact()
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({ resp ->
-                    hideLoading()
-                    rvItems!!.layoutManager = LinearLayoutManager(
-                        this,
-                        LinearLayoutManager.VERTICAL,
-                        false
-                    )
 
-                    rvItems!!.adapter =
-                        ContactAdapter(this, resp, object : ContactAdapter.AdapterActions {
-                            override fun deleteContact(contact: Contact) {
-                                showDeleteDialog(contact)
-                            }
+        getViewModel().getAllContacts()
+        getViewModel().contactsLiveData.observe(this, Observer {
+            rvItems?.apply {
+                layoutManager =
+                    LinearLayoutManager(this@MainActivity, LinearLayoutManager.VERTICAL, false)
+                adapter =
+                    ContactAdapter(this@MainActivity, it, object : ContactAdapter.AdapterActions {
+                        override fun deleteContact(contact: Contact) {
+                            showDeleteDialog(contact)
+                        }
 
-                            override fun editContact(contact: Contact) {
-                                showContactDailog(contact)
-                            }
+                        override fun editContact(contact: Contact) {
+                            showContactDailog(contact)
+                        }
 
-                            override fun openDetail(contact: Contact) {
-                                val intent =
-                                    Intent(this@MainActivity, ContactDetailActivity::class.java)
-                                intent.putExtra("contact", contact)
-                                startActivity(intent)
-                            }
+                        override fun openDetail(contact: Contact) {
+                            val intent =
+                                Intent(this@MainActivity, ContactDetailActivity::class.java)
+                            intent.putExtra("contact", contact)
+                            startActivity(intent)
+                        }
 
 
-                        })
+                    })
+            }
+        })
 
-
-
-                    Log.d(TAG, "getAllContact: $resp")
-                }) { throwable ->
-                    hideLoading()
-                    Log.d(TAG, "getAllContact: " + throwable.message)
-
-                }
-        )
     }
 
     private fun showDeleteDialog(contact: Contact) {
@@ -280,7 +241,6 @@ class MainActivity : BaseActivity() {
             setTitle(getString(R.string.delete_contact))
             setMessage(getString(R.string.delete_contact_message))
             setIcon(android.R.drawable.ic_dialog_alert)
-
                 .setPositiveButton(getString(R.string.yes)) { dialogInterface, _ ->
                     deleteContact(contact.id!!)
                     dialogInterface.dismiss()
@@ -398,5 +358,6 @@ class MainActivity : BaseActivity() {
         }
         return super.onOptionsItemSelected(item)
     }
+
 
 }

@@ -1,4 +1,4 @@
-package com.app.contactapp.ui
+package com.app.contactapp.ui.screens
 
 import android.content.Context
 import android.content.Intent

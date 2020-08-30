@@ -1,6 +1,6 @@
 package com.app.contactapp.data
 
-import android.content.Context
+import android.app.Application
 import com.app.contactapp.network.Rest.ApiClient
 import com.app.contactapp.network.Rest.ApiInterface
 import io.reactivex.Observable
@@ -10,23 +10,23 @@ import retrofit2.Response
  * Created by ibraheem lubbad on 8/23/20.
  * Copyright (c) 2020 ContactApp. All rights reserved.
  */
-class Repository(val mContext: Context) {
+class Repository(val app: Application, val serverUrl: String = ApiClient.SERVER_URL) {
     companion object {
         private const val TAG = "Repository"
         private var instance: Repository? = null
         private lateinit var apiClient: ApiInterface
 
         @Synchronized
-        fun getInstance(context: Context): Repository? {
+        fun getInstance(app: Application, serverUrl: String = ApiClient.SERVER_URL): Repository {
             if (instance == null) {
-                instance = Repository(context)
+                instance = Repository(app, serverUrl)
             }
-            return instance
+            return instance as Repository
         }
     }
 
     init {
-        apiClient = ApiClient.getApiClient(mContext)
+        apiClient = ApiClient.getApiClient(app, serverUrl)
     }
 
     fun createNewContact(contact: Contact): Observable<String> {

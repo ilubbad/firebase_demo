@@ -30,8 +30,19 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.3.1'
     implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.8.1")
+    implementation "android.arch.lifecycle:extensions:1.1.1"
+// Next we are going to add something a little weird: a library
+// called reactive streams. This will let us integrate rx with
+// android livedata.
+    implementation "android.arch.lifecycle:reactivestreams:1.1.1"
+    
     testImplementation 'junit:junit:4.12'
+  //  testImplementation 'org.mockito:mockito-core:2.6.8'
+    testImplementation "com.nhaarman.mockitokotlin2:mockito-kotlin:2.0.0"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
+    testImplementation 'org.mockito:mockito-inline:2.13.0'
+
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
     implementation 'com.google.firebase:firebase-analytics:17.5.0'
     implementation 'com.google.firebase:firebase-auth:19.3.2'
@@ -48,7 +59,14 @@ dependencies {
 
 
 
+    // MOCK WEB SERVER
+    testImplementation 'com.squareup.okhttp:mockwebserver:2.7.5'
+    // CORE TESTING
+    testImplementation 'android.arch.core:core-testing:1.1.1'
+    // ROBOLECTRIC
+    testImplementation 'org.robolectric:robolectric:3.8'
 
+    
     //Rxjava
     implementation 'io.reactivex.rxjava2:rxandroid:2.1.1'
     implementation 'io.reactivex.rxjava2:rxjava:2.2.9'
@@ -58,7 +76,6 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.8.6'
 
     compile "com.daimajia.swipelayout:library:1.2.0@aar"
-
 
 
 }
