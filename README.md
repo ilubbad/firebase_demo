@@ -24,13 +24,6 @@ Back-End using Google Cloud Functions: (express.js/node)
 •	API getEntryById
 
 
-You will need a Firebase project and firebase tools cli
-npm install -g firebase-tools
+To use this, you will need a Firebase project and Firebase tools CLI installed. You can install it using the command "npm install -g firebase-tools".
 
-log in to firebase in the terminal
-firebase login
-Deploy to firebase
-For the first time, you have deploy the hosting and functions together
-firebase deploy
-After that, you just need to deploy functions only
-firebase deploy --only functions
+To log in to Firebase in the terminal, use the command "firebase login". To deploy to Firebase, for the first time, you need to deploy hosting and functions together using the command "firebase deploy". After that, you only need to deploy functions using the command "firebase deploy --only functions".
